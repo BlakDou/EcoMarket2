@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EcoMarket - Verduras</title>
+  <link rel="stylesheet" href="diseño.css" />
+  <style>
+    #userActions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: #4caf50;
+    }
+    #userActions button {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #userActions button:hover {
+      background-color: #388e3c;
+    }
+
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .product-card {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .product-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .product-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .product-card button {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .product-card button:hover {
+      background-color: #388e3c;
+    }
+
+    .cart {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 1000;
+      transition: transform 0.3s;
+    }
+    .cart.hidden {
+      transform: translateX(400px);
+    }
+    .cart h2 {
+      text-align: center;
+      color: #4caf50;
+    }
+    #cartItems li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
+    }
+    #cartItems li img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+    .cart-item button {
+      margin: 0 2px;
+      padding: 2px 6px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .cart-item button:hover {
+      background-color: #b71c1c;
+    }
+    #cartItems input[type="number"] {
+      width: 40px;
+      text-align: center;
+      margin: 0 3px;
+    }
+
+    .contact-section {
+      padding: 20px;
+    }
+    .contact-section form {
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .contact-section label {
+      margin-top: 10px;
+    }
+    .contact-section input, .contact-section textarea {
+      padding: 5px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .contact-section button {
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .contact-section button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <div class="logo">EcoMarket</div>
+    <ul class="menu">
+      <li><a href="verduras.html" class="active">Verduras</a></li>
+      <li><a href="frutas.html">Frutas</a></li>
+      <li><a href="legumbres.html">Legumbres</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Buscar producto..." />
+      <button id="searchBtn">Buscar</button>
+    </div>
+    <div id="userActions"></div>
+    <button id="cartBtn" title="Ver carrito">🛒 <span id="cartCount">0</span></button>
+  </nav>
+</header>
+
+<main>
+  <section id="products" class="products-container"></section>
+</main>
+
+<aside id="cart" class="cart hidden">
+  <h2>Tu carrito</h2>
+  <ul id="cartItems"></ul>
+  <p>Total: S/ <span id="cartTotal">0.00</span></p>
+  <button id="checkoutBtn">Pagar</button>
+  <button id="closeCartBtn">Cerrar</button>
+</aside>
+
+<section id="contacto" class="contact-section">
+  <h2>Contacto</h2>
+  <form id="contactForm">
+    <label for="name">Nombre:</label>
+    <input type="text" name="name" id="name" required />
+    <label for="email">Correo electrónico:</label>
+    <input type="email" name="email" id="email" required />
+    <label for="message">Mensaje:</label>
+    <textarea name="message" id="message" rows="4" required></textarea>
+    <button type="submit">Enviar</button>
+  </form>
+  <div id="contactMessage" style="color: green; font-weight: bold; margin-top: 10px;"></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+<script>
+  (function(){
+    emailjs.init("mAvnLhYQa8v8sXiC_"); 
+  })();
+
+  document.getElementById("contactForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    emailjs.sendForm("service_yfzhxv9", "template_bzcve6b", this)
+      .then(() => {
+        document.getElementById("contactMessage").textContent = "✅ Se ha enviado el mensaje correctamente.";
+        document.getElementById("contactForm").reset();
+      }, (err) => {
+        document.getElementById("contactMessage").textContent = "❌ Error al enviar: " + JSON.stringify(err);
+      });
+  });
+</script>
+
+<script>
+  const userActions = document.getElementById('userActions');
+  const productsContainer = document.getElementById('products');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const cartBtn = document.getElementById('cartBtn');
+  const cart = document.getElementById('cart');
+  const cartItemsContainer = document.getElementById('cartItems');
+  const cartTotalSpan = document.getElementById('cartTotal');
+  const closeCartBtn = document.getElementById('closeCartBtn');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+
+  let usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+  let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+  const categoriaSeleccionada = 'verduras';
+
+  const products = [
+    { id: 1, nombre: "Papa", categoria: "verduras", precio: 2.00, imagen: "imagenes_frutas/papa.jpeg" }, 
+    { id: 2, nombre: "Olluco", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/olluco.jpg" }, 
+    { id: 3, nombre: "Oca", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/oca.jpg" }, 
+    { id: 4, nombre: "Mashua", categoria: "verduras", precio: 3.50, imagen: "imagenes_frutas/mashua.jpg" }, 
+    { id: 5, nombre: "Ají amarillo", categoria: "verduras", precio: 4.00, imagen: "imagenes_frutas/aji_amarillo.png" }, 
+    { id: 6, nombre: "Ají panca", categoria: "verduras", precio: 4.00, imagen: "imagenes_frutas/aji_panca.jpeg" }, 
+    { id: 7, nombre: "Rocoto", categoria: "verduras", precio: 4.50, imagen: "imagenes_frutas/rocoto.jpg" }, 
+    { id: 8, nombre: "Muña", categoria: "verduras", precio: 2.50, imagen: "imagenes_frutas/muna.jpg" }, 
+    { id: 9, nombre: "Cebolla", categoria: "verduras", precio: 2.00, imagen: "imagenes_frutas/cebolla.jpg" }, 
+    { id: 10, nombre: "Ajo", categoria: "verduras", precio: 2.50, imagen: "imagenes_frutas/ajo.jpg" }, 
+    { id: 11, nombre: "Zanahoria", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/zanahoria.jpg" }, 
+    { id: 12, nombre: "Espinaca", categoria: "verduras", precio: 2.50, imagen: "imagenes_frutas/espinacas.jpg" }, 
+    { id: 13, nombre: "Holantao", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/holantao.png" }, 
+    { id: 14, nombre: "Vainitas", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/vainas.avif" }, 
+    { id: 15, nombre: "Tomate", categoria: "verduras", precio: 3.50, imagen: "imagenes_frutas/tomate.png" }, 
+    { id: 16, nombre: "Poro", categoria: "verduras", precio: 3.20, imagen: "imagenes_frutas/poro.jpeg" }, 
+    { id: 17, nombre: "Alcachofa", categoria: "verduras", precio: 4.00, imagen: "imagenes_frutas/alcachofa.webp" }, 
+    { id: 18, nombre: "Choclo", categoria: "verduras", precio: 2.50, imagen: "imagenes_frutas/choclo.webp" }, 
+    { id: 19, nombre: "Yuca", categoria: "verduras", precio: 3.00, imagen: "imagenes_frutas/yuca.webp" }, 
+    { id: 20, nombre: "Huacatay", categoria: "verduras", precio: 2.50, imagen: "imagenes_frutas/huacatay.jpg" }, 
+    { id: 21, nombre: "Caigua", categoria: "verduras", precio: 3.50, imagen: "imagenes_frutas/caigua.webp" },
+  ];
+
+  function mostrarProductos() {
+    let lista = products;
+    const query = searchInput.value.trim().toLowerCase();
+    if (query !== '') lista = lista.filter(p => p.nombre.toLowerCase().includes(query));
+
+    productsContainer.innerHTML = '';
+    if (lista.length === 0) {
+      productsContainer.innerHTML = '<p>No hay productos que coincidan.</p>';
+      return;
+    }
+
+    lista.forEach(prod => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <img src="${prod.imagen}" alt="${prod.nombre}" />
+        <div class="product-info">
+          <h3>${prod.nombre}</h3>
+          <p>S/ ${prod.precio.toFixed(2)} por kg</p>
+          <input type="number" min="1" value="1" />
+          <button>Agregar al carrito</button>
+        </div>
+      `;
+      card.querySelector('button').addEventListener('click', () => {
+        const cantidad = parseInt(card.querySelector('input').value);
+        if (cantidad > 0) agregarAlCarrito(prod, cantidad);
+        else alert('Ingrese una cantidad válida.');
+      });
+      productsContainer.appendChild(card);
+    });
+  }
+
+  function agregarAlCarrito(prod, cantidad) {
+    const idx = carrito.findIndex(item => item.id === prod.id);
+    if (idx !== -1) carrito[idx].cantidad += cantidad;
+    else carrito.push({ ...prod, cantidad });
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarCarritoUI();
+    alert(`${prod.nombre} agregado al carrito.`);
+  }
+
+  function actualizarCarritoUI() {
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+    if (carrito.length === 0) cartItemsContainer.innerHTML = '<li>Carrito vacío</li>';
+    else {
+      carrito.forEach(item => {
+        total += item.precio * item.cantidad;
+        const li = document.createElement('li');
+        li.innerHTML = `<img src="${item.imagen}" alt="${item.nombre}"/>
+                        <div class="item-details">
+                          <p>${item.nombre}</p>
+                          <p class="item-qty">Cantidad: ${item.cantidad}</p>
+                        </div>
+                        <button class="remove-btn">❌</button>`;
+        li.querySelector('.remove-btn').addEventListener('click', () => {
+          carrito = carrito.filter(i => i.id !== item.id);
+          localStorage.setItem('carrito', JSON.stringify(carrito));
+          actualizarCarritoUI();
+        });
+        cartItemsContainer.appendChild(li);
+      });
+    }
+    cartTotalSpan.textContent = total.toFixed(2);
+    document.getElementById('cartCount').textContent = carrito.reduce((acc, it) => acc + it.cantidad, 0);
+  }
+
+  cartBtn.addEventListener('click', () => cart.classList.toggle('hidden'));
+  closeCartBtn.addEventListener('click', () => cart.classList.add('hidden'));
+  checkoutBtn.addEventListener('click', () => {
+    alert('Gracias por tu compra (simulado).');
+    carrito = [];
+    actualizarCarritoUI();
+    localStorage.removeItem('carrito');
+    cart.classList.add('hidden');
+  });
+
+  function mostrarOpcionesUsuario() {
+    if (usuarioActivo) {
+      userActions.innerHTML = `
+        <span>Hola, ${usuarioActivo.nombre}</span>
+        <button id="logoutBtn">Cerrar sesión</button>
+      `;
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('usuarioActivo');
+        usuarioActivo = null;
+        mostrarOpcionesUsuario();
+      });
+    } else {
+      userActions.innerHTML = `
+        <button id="loginBtn">Login</button>
+        <button id="registerBtn">Registro</button>
+      `;
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        window.location.href = 'login.html';
+      });
+      document.getElementById('registerBtn').addEventListener('click', () => {
+        window.location.href = 'registro.html';
+      });
+    }
+  }
+
+  searchBtn.addEventListener('click', mostrarProductos);
+  searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); mostrarProductos(); } });
+
+  mostrarOpcionesUsuario();
+  mostrarProductos();
+  actualizarCarritoUI();
+</script>
+</body>
+</html>
